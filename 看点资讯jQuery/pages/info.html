@@ -1,0 +1,261 @@
+<!-- 资讯管理 -->
+<div id="info-manage">
+	<div class="info-manage">
+		<select style="display: inline-block; width: 200px; height: 30px" id="xiala"><option>li</option></select>
+		<div class="btns-div" style="display: inline-block;">
+			<button type="button" class="btn btn-success" id="to-add">新增</button>
+			<button type="button" class="btn btn-danger" id="plsc">批量删除</button>
+		</div>
+
+		<!-- 模态框 -->
+		<div class="modal" id="myModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button class="btn btn-default close" data-dismiss="modal">&times;</button>
+						<span class="modal-title">模态框的标题</span>
+					</div>
+					<div class="modal-body">
+						<!-- 录入信息表单 -->
+						<form action="" class="form-horizontal">
+							<div class="form-group">
+								<label for="username" class="col-sm-3 control-label">标题：</label>
+								<div class="col-sm-9">
+									<input id="title" type="text" class="form-control" placeholder="请输入标题" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="password" class="col-sm-3 control-label">所属栏目：</label>
+								<div class="col-sm-9">
+									<select class="form-control" id="category">
+										<!-- <option selected="" value="555" >请选择父栏目</option> -->
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="password" class="col-sm-3 control-label">列表样式：</label>
+								<div class="col-sm-9">
+									<input type="radio" name="liststyle" value="style-one"><img src="./images/style-one.jpg" style="width:190px;display: inline-block;">
+									<input type="radio" name="liststyle" value="style-two"><img src="./images/style-two.jpg" style="width:190px;display: inline-block;">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="male" class="col-sm-3 control-label">正文：</label>
+								<div class="col-sm-9">
+									<textarea class="form-control" id="content" placeholder="请输入正文"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-default" data-dismiss="modal">取消</button>
+						<button class="btn btn-primary" id="to-save">保存</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="table-div">
+			<table class="table table-bordered text-center table-hover">
+				<thead>
+					<tr>
+						<th class="text-center">编号</th>
+						<th class="text-center">文章标题</th>
+						<th class="text-center">所属栏目</th>
+						<th class="text-center">排列方式</th>
+						<th class="text-center">作者</th>
+						<th class="text-center">发布时间</th>
+						<th class="text-center">阅读</th>
+						<th class="text-center">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	getAjax('/manager/category/findAllCategory','get',null,function(res){res.data.forEach(function(){
+		var $a=''
+		res.data.forEach(function(item){
+			$a += `<option value="`+item.id+`">`+item.name+`</option>`
+
+		})
+		$('#xiala').html($a)
+	})},function(error){console.log(error)})
+	$('#xiala').click(function(){
+		//清空表单
+		$('.info-manage tbody').html(null)
+		var catId=$('#xiala option:selected')
+	// console.log(catId.val())
+	var obj={page:0,pageSize:100,categoryId:catId.val()}
+	
+	getArticle()
+	function getArticle(){
+		getAjax('/manager/article/findArticle','get',obj,function(res){
+			
+			res.data.list.forEach(function(item){
+				
+				$('.info-manage tbody').append(`
+					<tr>
+						<td><input type="checkbox" name="" value='`+item.id+`'>`+item.id+`</td>
+						<td>`+item.title+`</td>
+						<td>`+item.category.name+`</td>
+						<td>`+item.liststyle+`</td>
+						<td>`+null+`</td>
+						<td>`+item.publishtime+`</td>
+						<td>`+item.readtimes+`</td>
+						<td><i title="修改" data-id="`+item.id+`" data-title='`+item.title+`' data-categoryId='`+item.category.name+`' data-liststyle='`+item.liststyle+`' data-content='`+item.content+`' class="fa fa-pencil-square-o" aria-hidden="true" id="to-update"></i>
+							<i title="删除" data-id='`+item.id+`' class="fa fa-trash-o" aria-hidden="true" id="shanchu"></i></td>
+						</tr>
+						`)
+
+			})
+			console.log(res)
+			//删除
+			$('i[title="删除"]').click(function(){
+				var $target = $(event.target).attr('data-id');
+				$target = {id:$target};
+				console.log($target);
+				getAjax('/manager/article/deleteArticleById','get',$target,function(res){
+
+					alert('删除成功'),console.log('删除成功')},function(error){console.log('删除失败')})
+			})
+
+			//批量删除
+			$('#plsc').click(function(event) {
+				var inputs = document.getElementsByTagName('input');
+				inputs = Array.prototype.slice.call(inputs,0);
+				var ids = inputs.filter(function(item){
+					return item.checked;
+				}).map(function(item){
+					return item.value;
+				});
+				console.log(ids)
+
+                     		// var obj=(obj.join())
+                     		// console.log(obj)
+                     		var ids={ids:ids.join()}
+                     		// console.log(ids)
+                     		getAjax('/manager/article/batchDeleteArticle','post',ids,function(res){
+                     			console.log(res);
+             		location.reload();
+             		alert('删除成功')
+             		// $('.info-content_content').load('./pages/category.html')
+             	},function(error){
+             		alert('删除失败')
+             		console.log('批量删除失败');
+             	})
+                     	});
+
+			//修改
+			$('i[title="修改"]').click(function(event,item){
+				var title=$(event.target).attr('data-title')
+				var categoryId=$(event.target).attr('data-categoryId')
+				var liststyle=$(event.target).attr('data-liststyle')
+				var content=$(event.target).attr('data-content')
+				console.log(title)
+				console.log(categoryId)
+				console.log(liststyle)
+				console.log(content)
+				getAjax('/manager/category/findAllCategory','get',null,function(res){res.data.forEach(function(){
+					var $a=''
+					res.data.forEach(function(item){
+						$a += `<option value="`+item.id+`">`+item.name+`</option>`
+
+					})
+					$('#category').html($a)
+				})},function(error){console.log(error)})
+				$('#title').val(title)
+				$('#category option:first').val(categoryId)
+				// $('[]').val(liststyle)
+				$('.modal [type=radio][value='+liststyle+']').prop('checked',true);
+				$('#content').val(content)
+				$('.modal-title').text('修改文章');
+				// 显示模态框
+				$('#myModal').modal('show');
+				var currentid=$(event.target).attr('data-id')
+				// var $currentid={id:currentid}
+				$('#to-save').click(function(){
+					var title=$('#title').val()
+					var category=$('#category').val()
+					var liststyle=$('.modal [name=liststyle]:checked').val();
+					var content=$('#content').val()
+					var obj2 = {
+						id:currentid,
+						title:title,
+						categoryId:category,
+						liststyle:liststyle,
+						content:content
+					};
+					console.log('传递给后台的数据是：',obj2);
+					getAjax('/manager/article/saveOrUpdateArticle','post',obj2,function(res){
+						// alert('修改成功')
+						// $('.info-content_content').load('./pages/category.html')
+						console.log('修改成功',res)
+					},function(error){console.log(error)})
+				})
+			})
+		},function(error){
+			console.log('222',error)}
+
+			)}
+
+	})
+	//新增
+	$('#to-add').click(function(){
+		$('#to-save').click(function(){
+			var title=$('#title').val()
+			var category=$('#category').val()
+			var liststyle=$('.modal [name=liststyle]:checked').val();
+			var content=$('#content').val()
+			console.log(title,category,liststyle,content)
+			if(title&&category&&liststyle&&content){
+				var obj = {
+					title:title,
+					categoryId:category,
+					liststyle:liststyle,
+					content:content
+				};
+				console.log('传递给后台的数据是：',obj);
+				getAjax('/manager/article/saveOrUpdateArticle','Post',obj,function(res){
+					
+					alert('新增成功')
+					console.log(res)
+						// $('.info-content_content').load('./pages/category.html')
+					},function(error){
+
+						console.log('新增失败',error)})
+
+					// 提交数据给后台
+					// 提交成功的回调函数里，更新数据，关闭模态框。
+					$('#myModal').modal('hide');
+				}
+				
+
+			})
+		$('.modal-title').text('新增文章');
+		$('#myModal').modal('show');
+		getAjax('/manager/category/findAllCategory','get',null,function(res){res.data.forEach(function(){
+			var $a=''
+			res.data.forEach(function(item){
+				$a += `<option value="`+item.id+`">`+item.name+`</option>`
+
+			})
+			$('#category').html($a)
+		})},function(error){console.log(error)})
+		
+
+	// $('#to-save').click(function(){
+	// 	console.log(title)
+	// 	console.log(category)
+	// 	console.log(liststyle)
+	// 	console.log(comment)
+	// })
+	
+})
+
+	
+</script>

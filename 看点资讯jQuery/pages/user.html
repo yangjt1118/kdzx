@@ -1,0 +1,247 @@
+<!-- 用户管理 -->
+<!-- <button type="button" class="btn btn-success" id="status" data-enable=`+res.data.enable+`>on</button> -->
+<div id="user-manage" style="background-color: #ddd;height: 1200px;">
+	
+	<div style="margin-left: 10px;">
+		<!-- 模态框 -->
+		<div class="modal" id="myModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button class="btn btn-default close" data-dismiss="modal">&times;</button>
+						<span class="modal-title">模态框的标题</span>
+					</div>
+					<div class="modal-body">
+						<!-- 录入信息表单 -->
+						<form action="" class="form-horizontal">
+							<div class="form-group">
+								<label for="username" class="col-sm-3 control-label">用户名：</label>
+								<div class="col-sm-9">
+									<input id="username" type="text" class="form-control" placeholder="请输入用户名" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="username" class="col-sm-3 control-label">密码：</label>
+								<div class="col-sm-9">
+									<input id="password" type="password" class="form-control" placeholder="请输入密码" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="username" class="col-sm-3 control-label">确认密码：</label>
+								<div class="col-sm-9">
+									<input id="password2" type="password" class="form-control" placeholder="请确认密码" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="username" class="col-sm-3 control-label">真实姓名：</label>
+								<div class="col-sm-9">
+									<input id="nickname" type="text" class="form-control" placeholder="请输入真实姓名" >
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="username" class="col-sm-3 control-label">邮箱：</label>
+								<div class="col-sm-9">
+									<input id="email" type="text" class="form-control" placeholder="请输入邮箱" >
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-default" data-dismiss="modal">取消</button>
+						<button class="btn btn-primary" id="to-save">保存</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="btns-div form-group" style="display:block;margin-top: 10px;margin-bottom: 10px;">
+			<button type="button" title="新增" class="btn btn-success" id="to-add">新增</button>
+			<input type="" name="" id="search" class="" style="border: none; height: 25px" placeholder="用户名查找">
+			<button class="btn btn-success" title="查找">查找</button>
+		</div>
+		<div id="user-list">
+
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	getAllUser()
+	function getAllUser(){
+		getAjax('/manager/user/findAllUser','get',null,function(res){
+			res.data.forEach(function(item){
+				if(item.regTime==null){
+						item.regTime ='_';
+					}
+				$('#user-list').append(`<div class="col-sm-4" style="display: block;font-size: 20px;line-height: 40px;background-color: #fff;box-shadow: 3px 3px 3px #cccccc;border: 1px solid #ddd;height:400px;margin-bottom: 10px;">
+					<img src="./images/toxiang.jpg" style="width: 150px;height: 150px;margin: 0 auto;border-radius:50%">
+					<div class="row" style="margin: 0 auto">
+						<div class="col-sm-4 col-sm-offset-1">用户名</div>
+						<div class="col-sm-7">`+item.username+`</div>
+					</div>
+					<div class="row" style="margin: 0 auto">
+						<div class="col-sm-4 col-sm-offset-1">真实姓名</div>
+						<div class="col-sm-7">`+item.nickname+`</div>
+					</div>
+					<div class="row" style="margin: 0 auto">
+						<div class="col-sm-4 col-sm-offset-1">注册时间</div>
+						<div class="col-sm-7">`+item.regTime+`</div>
+					</div>
+					<div class="row" style="margin: 0 auto">
+						<div class="col-sm-4 col-sm-offset-1">email</div>
+						<div class="col-sm-7">`+item.email+`</div>
+					</div>
+					<div class="row" style="margin: 0 auto">
+						<div class="col-sm-4 col-sm-offset-1"></div>
+						<div class="col-sm-7">
+							
+							<button type="button" title="删除" class="btn btn-danger" data-id=`+item.id+`>删除</button>
+						</div>
+					</div>
+				</div>`)
+				// console.log(res)
+				
+				
+
+				//删除
+				$('button[title="删除"]').click(function(event){
+					var id = $(event.target).attr('data-id');
+				// console.log(id)
+				var id={id:id}
+				// console.log(id)
+				getAjax('/manager/user/deleteUserById','get',id,function(res){
+					// alert('删除成功')
+					console.log('删除成功',res)
+					// $('.info-content_content').load('./pages/user.html')
+				},function(error){console.log('删除失败')})
+
+			})
+
+
+
+
+			})
+		},function(error){console.log('展示失败')})
+
+
+	// 状态
+	$('body').on('click','[title=状态]',function () {
+		// $('#user-list').html(null)
+		var state = $(this).attr('date-state');
+		// console.log(state)
+		// console.log(this)
+		if(state === 'true'){
+			state = false;
+		}else{
+			state = true;
+		}
+    // console.log(state);
+    var id = ($(this).attr('date-id'));
+   // console.log(id);
+   var obj2 = {
+   	id:id,
+   	status:state
+   };
+   // console.log(state);
+   // console.log(obj2);
+   getAjax('/manager/user/changeStatus','post',obj2,function (res) {
+   		if(state === 'true'){
+                //$(this).text('on').addClass('btn-success').removeClass('btn-danger');
+                $(this).removeClass('btn-success').addClass('btn-danger').text('off');
+
+                // $('#user-list').html(null)
+                // getAllUser()
+                // console.log(111)
+            }else {
+            	$(this).addClass('btn-danger').removeClass('btn-danger').text('on');
+            	// $('#user-list').html(null)
+                //$(this).removeClass('btn-success').addClass('btn-danger').text('off');
+                // getAllUser()
+                // console.log(222)
+            }
+        },
+        function (error) {
+        	console.log(error)
+        });
+});	
+
+
+
+			//查找
+			$('button[title="查找"]').click(function(event){
+				var username=$('#search').val()
+				// console.log(username)
+				var username={username:username}
+				// getAjax('/manager/user/findAllUser','get',null,function(res){
+				// 	var arr
+				// 	res.data.forEach(function(item){
+				// 		 arr=new Array()
+				// 		arr.push(item.username)
+				// 		// console.log(arr)
+				// 	})
+				// 	console.log(arr)
+				// },function(){})
+				getAjax('/manager/user/findUserByUsername','get',username,function(res){
+					$('#user-list').html(null)
+					// console.log(res.data)
+					$('#user-list').append(`<div class="col-sm-4" style="display: block;font-size: 20px;line-height: 40px;background-color: #fff;box-shadow: 3px 3px 3px #cccccc;border: 1px solid #ddd;height:400px;margin-bottom: 10px;">
+						<img src="./images/toxiang.jpg" style="width: 150px;height: 150px;margin: 0 auto;border-radius:50%">
+						<div class="row" style="margin: 0 auto">
+							<div class="col-sm-4 col-sm-offset-1">用户名</div>
+							<div class="col-sm-7">`+res.data.username+`</div>
+						</div>
+						<div class="row" style="margin: 0 auto">
+							<div class="col-sm-4 col-sm-offset-1">真实姓名</div>
+							<div class="col-sm-7">`+res.data.nickname+`</div>
+						</div>
+						<div class="row" style="margin: 0 auto">
+							<div class="col-sm-4 col-sm-offset-1">注册时间</div>
+							<div class="col-sm-7">`+res.data.regTime+`</div>
+						</div>
+						<div class="row" style="margin: 0 auto">
+							<div class="col-sm-4 col-sm-offset-1">email</div>
+							<div class="col-sm-7">`+res.data.email+`</div>
+						</div>
+						<div class="row" style="margin: 0 auto">
+							<div class="col-sm-4 col-sm-offset-1">状态</div>
+							<div class="col-sm-7">
+								<button id="status">`+(res.data.enabled?'on':'off')+`</button>
+								<button type="button" title="删除" class="btn btn-danger" id="status" data-id=`+res.data.id+`>删除</button>
+							</div>
+						</div>
+					</div>`)
+					getAjax('/manager/user/findAllUser','get',username,function(res){},function(error){})
+					console.log('查找成功',res)
+				},function(error){console.log('查找失败')})
+			})
+
+			
+
+		}
+	//新增
+	$('button[title="新增"]').click(function(){
+		$('#to-save').click(function(){
+			var username=$('#username').val()
+			var password=$('#password').val()
+			var password2=$('#password2').val()
+			var nickname=$('#nickname').val()
+			var email=$('#email').val()
+					// console.log(username,password,ninkname,email)
+					if(password===password2){
+						var obj={
+							username:username,
+							password:password,
+							nickname:nickname,
+							email:email
+						}
+						console.log(obj)
+						getAjax('/manager/user/saveOrUpdateUser','post',obj,function(res){
+							console.log(res)
+						},function(error){console.log(error)})
+					}else{
+						alert('请重新输入密码')
+					}
+					$('#myModal').modal('hide');
+				})
+		$('.modal-title').text('添加用户');
+		$('#myModal').modal('show');
+	})
+</script>

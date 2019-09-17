@@ -1,0 +1,115 @@
+*{
+	margin:0;
+	padding:0;
+}
+html,body{
+	height: 100%;
+	background-color: #ddd
+}
+article,header,section,nav,img{
+	display: block;
+	
+}
+body{
+	display: flex;
+}
+/*左侧*/
+.info-left{
+	width: 250px;
+	background-color: #282830;
+	color: white;
+}
+/*头部*/
+.info-header{
+	height: 50px;
+	line-height: 50px;
+}
+.info-left .info-header{
+	background-color: #3D556C;
+	color: white;
+	font-size:20px;
+}
+.info-left .info-header img{
+	height: 30px;
+	float: left;
+	margin-left:20px;
+	margin-top: 10px;
+}
+.info-left .info-header span{
+	margin-left:10px;
+}
+.info-content_nav{
+	width: 250px;
+	height: calc(100% - 50px);
+	border-right:1px solid #999;
+}
+.info-content_nav span{
+	margin-left:5px;
+}
+.info-content_nav li{
+	list-style: none;
+	line-height: 50px;
+	padding-left:10px;
+	padding:5px 5px 5px 10px;
+	font-size:16px;
+	border-bottom: 1px solid #999;
+	cursor: pointer;
+}
+.info-content_nav li i:last-child{
+	float: right;
+	line-height: 30px;
+	margin-right:15px;
+}
+.info-content_nav li:hover{
+	background-color: #778899;
+	/*color:white;*/
+}
+/*右侧*/
+
+.info-right{
+	flex: 1;
+
+}
+.info-right span{
+	margin-left: 20px;
+	font-size: 20px;
+}
+.four{
+background-color: red;
+border-radius: 50%;
+display: inline-block;
+height: 14px;
+width: 14px;
+position: absolute;
+top: 10px;
+left: 315px;
+line-height: 18px;
+text-align: center;
+color: white;
+
+font-size: 9px;
+}
+.info-right .info-header{
+	background:#efefef;
+}
+
+
+.info-right .info-content_content{
+	/*padding:10px;*/
+	background-color:  #F5F5F5
+}
+.table-div td i{
+	cursor: pointer;
+	margin-right: 5px;
+}
+.table-div td i:last-child{
+	margin-right: 0px;
+}
+.table-div td i[title=修改]{
+	color: #5cd85c;
+}
+.table-div td i[title=删除]{
+	color: #c9302c;
+}
+
+
